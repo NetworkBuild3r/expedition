@@ -1,15 +1,22 @@
 FROM ubuntu:20.04
-RUN apt-get update
-RUN apt-get -y install apt-transport-https lsb-core lsb-release net-tools netcat-openbsd sudo
-RUN touch /usr/bin/firewall-cmd
-RUN chmod +x /usr/bin/firewall-cmd
-RUN useradd -m expedition
-RUN chmod 755 /root
+
+RUN apt-get update \
+    && apt-get -y install apt-transport-https lsb-core lsb-release net-tools netcat-openbsd sudo \
+    && touch /usr/bin/firewall-cmd \
+    && chmod +x /usr/bin/firewall-cmd \
+    && useradd -m expedition \
+    && chmod 755 /root
+
 COPY ./setup /setup
 WORKDIR /setup
+
 ENV TERM=xterm
-RUN ./initSetup.sh
+
+RUN ./initSetup.sh \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && apt-get clean
+
 WORKDIR /
-RUN rm -rf /setup /tmp/*
+
 COPY start.sh /
-CMD /start.sh
+CMD ["/start.sh"]
